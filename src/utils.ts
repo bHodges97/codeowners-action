@@ -10,14 +10,27 @@ export async function getVersionControlledFiles(): Promise<string[]> {
       '--name-only'
     ])
 
+    let stdout = ''
+    let stderr = ''
+
     listVersionControlledFilesCommand.stdout.on('data', (data: Buffer) => {
-      const stdout = data.toString()
-      resolve(stdout.split(/\r?\n/).filter(Boolean))
+      stdout += data.toString()
     })
 
     listVersionControlledFilesCommand.stderr.on('data', (data: Buffer) => {
-      if (data != null) reject(data)
-      reject(new Error('Unknown error.'))
+      stderr += data.toString()
+    })
+
+    listVersionControlledFilesCommand.on('error', (error: Error) => {
+      reject(error)
+    })
+
+    listVersionControlledFilesCommand.on('close', (code: number) => {
+      if (code !== 0) {
+        reject(new Error(`Command failed with exit code ${code}: ${stderr}`))
+      } else {
+        resolve(stdout.split(/\r?\n/).filter(Boolean))
+      }
     })
   })
 }
