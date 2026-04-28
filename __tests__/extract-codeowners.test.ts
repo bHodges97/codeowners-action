@@ -11,7 +11,7 @@ test('should return object if valid path is given', async () => {
 test('should throw error if invalid path is given', async () => {
   try {
     await extractCodeOwners(`invalid`)
-  } catch (e) {
+  } catch (e: any) {
     expect(e.code).toEqual('ENOENT')
   }
 })
