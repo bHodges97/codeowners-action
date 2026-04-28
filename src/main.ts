@@ -41,7 +41,9 @@ async function extractCodeOwnerInfo(
         )
     })
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    }
   }
 }
 
